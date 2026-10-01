@@ -2,6 +2,7 @@
   'use strict';
 
   const STORAGE_KEY = 'placa.vendas.v1';
+  const VIEW_KEY = 'placa.visao.v1';
   const MAX_AMOUNT = 999999999;
   const $ = (selector) => document.querySelector(selector);
   const money = (cents) => (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -72,6 +73,30 @@
   }
 
   const envelope = (records, purchaseRecords = purchases) => ({ app: 'placa', version: 2, exportedAt: new Date().toISOString(), sales: records, purchases: purchaseRecords });
+
+  function latestRecordMonth() {
+    return [...sales, ...purchases].reduce((latest, record) => record.date.slice(0, 7) > latest ? record.date.slice(0, 7) : latest, '');
+  }
+
+  function initialMonth() {
+    try {
+      const savedMonth = localStorage.getItem(VIEW_KEY);
+      if (typeof savedMonth === 'string' && /^[0-9]{4}-[0-9]{2}$/.test(savedMonth) && validDate(`${savedMonth}-01`)) return savedMonth;
+    } catch {
+      // A preference must not prevent reading sales or reporting storage errors.
+    }
+    const currentMonth = localDate().slice(0, 7);
+    const hasCurrentRecords = [...sales, ...purchases].some(record => record.date.startsWith(`${currentMonth}-`));
+    return hasCurrentRecords ? currentMonth : latestRecordMonth() || currentMonth;
+  }
+
+  function rememberMonth(month) {
+    try {
+      if (localStorage.getItem(VIEW_KEY) !== month) localStorage.setItem(VIEW_KEY, month);
+    } catch {
+      // Sales still follow the normal save/error flow if preferences cannot be saved.
+    }
+  }
 
   function toast(message) {
     clearTimeout(toastTimer);
@@ -144,7 +169,12 @@
 
   function render() {
     const month = $('#month-filter').value;
+    rememberMonth(month);
     const filtered = sales.filter(sale => sale.date.startsWith(`${month}-`)).sort((a, b) => b.date.localeCompare(a.date));
+    const hasMonthPurchases = purchases.some(purchase => purchase.date.startsWith(`${month}-`));
+    const hasOtherRecords = sales.length > 0 || purchases.length > 0;
+    $('#period-notice').hidden = filtered.length > 0 || hasMonthPurchases || !hasOtherRecords;
+    $('#period-notice-text').textContent = `Nenhum registro em ${monthLabel(month)}. Seus dados continuam salvos em outros meses.`;
     const totals = filtered.reduce((sum, sale) => {
       sum.sold += sale.amountCents;
       sum[sale.payment] += sale.amountCents;
@@ -403,7 +433,6 @@
   document.querySelectorAll('[data-close]').forEach(button => button.addEventListener('click', () => document.getElementById(button.dataset.close).close()));
   $('#new-sale').addEventListener('click', () => openSale());
   $('#empty-new-sale').addEventListener('click', () => openSale());
-  $('#month-filter').value = localDate().slice(0, 7);
   $('#month-filter').addEventListener('change', () => {
     if (!/^[0-9]{4}-[0-9]{2}$/.test($('#month-filter').value) || !validDate(`${$('#month-filter').value}-01`)) $('#month-filter').value = localDate().slice(0, 7);
     render();
@@ -416,6 +445,10 @@
   }
   $('#previous-month').addEventListener('click', () => moveMonth(-1));
   $('#next-month').addEventListener('click', () => moveMonth(1));
+  $('#view-latest-month').addEventListener('click', () => {
+    const month = latestRecordMonth();
+    if (month) { $('#month-filter').value = month; render(); }
+  });
 
   $('#export-backup').addEventListener('click', () => {
     try {
@@ -464,5 +497,6 @@
     toast(hadDialog ? 'Dados alterados em outra aba. O formulário foi fechado; confira a lista antes de editar.' : 'Dados atualizados a partir de outra aba.');
   });
   load();
+  $('#month-filter').value = initialMonth();
   render();
 })();

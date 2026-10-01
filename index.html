@@ -38,6 +38,7 @@
       <div class="section-heading"><h2 id="overview-title">Visão geral <span class="period-caption">do mês</span></h2>
         <div class="month-navigation"><button class="icon-button" id="previous-month" aria-label="Mês anterior"><svg class="rotate"><use href="#i-chevron"/></svg></button><label class="month-label"><span class="sr-only">Selecionar mês</span><input id="month-filter" type="month" min="0001-01" max="9999-12" required></label><button class="icon-button" id="next-month" aria-label="Próximo mês"><svg><use href="#i-chevron"/></svg></button></div>
       </div>
+      <div id="period-notice" class="period-notice" role="status" hidden><p id="period-notice-text"></p><button class="button text-button" id="view-latest-month">Ver último mês com registros<svg><use href="#i-chevron"/></svg></button></div>
       <div class="summary-grid" aria-live="polite" aria-atomic="true">
         <article class="summary-card featured"><span class="metric-label">Total vendido</span><strong id="total-sold">R$ 0,00</strong><span class="metric-note" id="sales-count">Nenhuma venda no mês</span><span class="card-spark" aria-hidden="true">↗</span></article>
         <article class="summary-card"><span class="metric-label"><i class="status-dot green"></i>Valor recebido</span><strong id="total-paid">R$ 0,00</strong><span class="metric-note">Pagamentos confirmados</span></article>

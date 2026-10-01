@@ -36,8 +36,8 @@ A data começa no dia atual e pode ser alterada. Os dados são salvos assim que 
 Clone o repositório e entre na pasta:
 
 ```sh
-git clone https://github.com/joaonavari/placa-nfc.git
-cd placa-nfc
+git clone https://github.com/joaonavari/Vendas_Pr.git
+cd Vendas_Pr
 ```
 
 Você pode abrir `index.html` diretamente em um navegador atualizado (Chrome, Edge, Safari ou Firefox). Para usar um endereço local estável, com Python 3 instalado, execute:
@@ -57,7 +57,7 @@ Com os arquivos na branch `main`:
 3. Selecione a branch **main** e a pasta **/ (root)** e clique em **Save**.
 4. Aguarde a publicação. O endereço aparecerá nessa tela.
 
-Depois de ativado, este projeto ficará disponível em **https://joaonavari.github.io/placa-nfc/**. Se você fizer um fork, use seu nome de usuário e o nome do seu repositório no endereço.
+O site deste repositório está em **https://joaonavari.github.io/Vendas_Pr/**. Se você fizer um fork, ative o GitHub Pages e use seu nome de usuário e o nome do seu repositório no endereço.
 
 Os caminhos dos arquivos são relativos (`./`), portanto funcionam também no subdiretório de um repositório. O arquivo `.nojekyll` desativa o processamento pelo Jekyll. Basta atualizar os arquivos na branch escolhida para publicar novas versões.
 
@@ -67,6 +67,7 @@ Referências: [Configurar a origem de publicação](https://docs.github.com/en/p
 
 - **Cadastrar venda:** informe cliente/loja, quantidade, valor total negociado, pagamento e data. A data começa no dia atual do computador. O valor é o total da venda, nunca o preço unitário. Aceita `250,00`, `250.00` e `1.250,00`.
 - **Filtrar:** o seletor de mês e as setas filtram vendas, compras, totais e gráfico pelas respectivas datas. O valor recebido representa vendas desse mês marcadas como pagas, independentemente do dia em que o pagamento foi recebido. O custo médio considera as compras de todos os meses até o fim do mês selecionado.
+- **Retomar:** o mês selecionado é lembrado ao atualizar ou abrir o site novamente. Na primeira abertura sem essa preferência, o painel mostra o mês atual se houver registros nele; caso contrário, o último mês com registros. Se você selecionar um mês vazio, um aviso permite voltar ao último mês com registros.
 - **Salvar:** a lista, os totais e o gráfico são atualizados imediatamente. Se a venda tiver data em outro mês, o painel muda para esse mês e avisa.
 - **Editar:** use o lápis na linha. Também é possível voltar um pagamento para pendente pelo formulário.
 - **Receber:** use **Marcar como paga** nas vendas pendentes.
@@ -132,7 +133,7 @@ Se a leitura falhar, os dados originais são preservados e novas vendas ficam bl
 ## Estrutura do projeto
 
 ```text
-placa-nfc/
+Vendas_Pr/
 ├── index.html          # Interface e formulários
 ├── styles.css          # Estilos e layout responsivo
 ├── app.js              # Cadastros, cálculos, armazenamento e backup
