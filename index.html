@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f5f7">
+  <meta name="description" content="Seu controle de vendas de plaquinhas NFC, simples e salvo neste navegador.">
+  <title>Placa — Controle de vendas</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <svg class="icon-defs" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M5 16v4h14v-4"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4m-5 5 5-5 5 5M5 16v4h14v-4"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="m14 5 5 5M4 20l5-1L20 8a2 2 0 0 0-5-5L4 14z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 10v7m4-7v7"/></symbol>
+    <symbol id="i-storage" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="12" rx="2"/><path d="M8 20h8m-4-4v4M8 8h8"/></symbol>
+    <symbol id="i-plate" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="4"/><path d="M9 9a4 4 0 0 1 0 6m3-9a8 8 0 0 1 0 12"/></symbol>
+  </svg>
+  <header class="topbar"><div class="topbar-inner">
+    <a class="brand" href="./" aria-label="Placa, início"><span class="brand-mark"><svg><use href="#i-plate"/></svg></span>placa<span class="brand-dot">.</span></a>
+    <span class="brand-description">Seu controle de vendas</span>
+    <span class="local-badge"><span></span>Salvo neste navegador</span>
+  </div></header>
+  <main>
+    <div class="page-heading">
+      <div><p class="eyebrow">PLAQUINHAS GOOGLE COM NFC</p><h1>Suas vendas, em dia.</h1><p class="subtitle">Cada venda registrada. Tudo sob controle.</p></div>
+      <button class="button primary" id="new-sale"><svg><use href="#i-plus"/></svg>Cadastrar venda</button>
+    </div>
+    <div id="storage-error" class="error-banner" role="alert" hidden></div>
+    <section class="overview" aria-labelledby="overview-title">
+      <div class="section-heading"><h2 id="overview-title">Visão geral <span class="period-caption">do mês</span></h2>
+        <div class="month-navigation"><button class="icon-button" id="previous-month" aria-label="Mês anterior"><svg class="rotate"><use href="#i-chevron"/></svg></button><label class="month-label"><span class="sr-only">Selecionar mês</span><input id="month-filter" type="month" min="0001-01" max="9999-12" required></label><button class="icon-button" id="next-month" aria-label="Próximo mês"><svg><use href="#i-chevron"/></svg></button></div>
+      </div>
+      <div class="summary-grid" aria-live="polite" aria-atomic="true">
+        <article class="summary-card featured"><span class="metric-label">Total vendido</span><strong id="total-sold">R$ 0,00</strong><span class="metric-note" id="sales-count">Nenhuma venda no mês</span><span class="card-spark" aria-hidden="true">↗</span></article>
+        <article class="summary-card"><span class="metric-label"><i class="status-dot green"></i>Valor recebido</span><strong id="total-paid">R$ 0,00</strong><span class="metric-note">Pagamentos confirmados</span></article>
+        <article class="summary-card"><span class="metric-label"><i class="status-dot amber"></i>Valor pendente</span><strong id="total-pending">R$ 0,00</strong><span class="metric-note">A receber</span></article>
+        <article class="summary-card"><span class="metric-label">Plaquinhas vendidas</span><strong id="total-quantity">0 <small>un.</small></strong><span class="metric-note">Quantidade no mês</span></article>
+      </div>
+      <div class="summary-grid profit-grid" aria-live="polite" aria-atomic="true">
+        <article class="summary-card profit-card"><span class="metric-label">Lucro estimado do mês</span><strong id="total-profit">R$ 0,00</strong><span class="metric-note">Total vendido menos o custo das placas</span></article>
+        <article class="summary-card"><span class="metric-label">Custo das placas vendidas</span><strong id="total-sale-cost">R$ 0,00</strong><span class="metric-note">Quantidade vendida × custo médio</span></article>
+        <article class="summary-card"><span class="metric-label">Custo médio por placa</span><strong id="average-unit-cost">—</strong><span class="metric-note">Compras registradas até o fim deste mês</span></article>
+      </div>
+      <p class="profit-explanation" id="profit-explanation"></p>
+    </section>
+    <section class="panel chart-panel" aria-labelledby="chart-title">
+      <div class="panel-heading"><div><h2 id="chart-title">Vendas por dia</h2><p>O ritmo das suas vendas neste mês.</p></div><span class="chart-legend"><i></i>Valor vendido</span></div>
+      <div class="chart-scroll"><div class="chart" id="chart" aria-label="Gráfico de barras de vendas por dia"></div></div>
+      <p class="chart-caption" id="chart-caption"></p>
+    </section>
+    <section class="panel sales-panel" aria-labelledby="sales-title">
+      <div class="panel-heading"><div class="list-title"><h2 id="sales-title">Vendas do mês</h2><span id="list-count" class="count-badge">0</span></div><span class="muted small" id="list-period"></span></div>
+      <div class="table-scroll" id="table-container" hidden><table><thead><tr><th scope="col">Cliente / loja</th><th scope="col">Data</th><th scope="col" class="number">Qtd.</th><th scope="col" class="number">Valor total</th><th scope="col">Pagamento</th><th scope="col" class="actions-heading">Ações</th></tr></thead><tbody id="sales-body"></tbody></table></div>
+      <div class="empty-state" id="empty-state"><span class="empty-icon"><svg><use href="#i-plate"/></svg></span><h3>Um novo mês, novas vendas.</h3><p>Nenhuma venda registrada neste período.<br>Cadastre uma venda para começar.</p><button class="button secondary" id="empty-new-sale"><svg><use href="#i-plus"/></svg>Cadastrar venda</button></div>
+    </section>
+    <section class="panel purchases-panel" aria-labelledby="purchases-title">
+      <div class="panel-heading"><div><div class="list-title"><h2 id="purchases-title">Compras de plaquinhas</h2><span id="purchase-count" class="count-badge">0</span></div><p>Registre quanto comprou e o custo de cada unidade.</p></div><button class="button secondary" id="new-purchase"><svg><use href="#i-plus"/></svg>Cadastrar compra</button></div>
+      <div class="purchase-summary" aria-live="polite"><span>Compradas no mês <strong id="purchased-quantity">0 un.</strong></span><span>Total gasto no mês <strong id="purchased-total">R$ 0,00</strong></span></div>
+      <div class="table-scroll" id="purchase-table-container" hidden><table><thead><tr><th scope="col">Data da compra</th><th scope="col" class="number">Quantidade</th><th scope="col" class="number">Custo por unidade</th><th scope="col" class="number">Custo total</th><th scope="col" class="actions-heading">Ações</th></tr></thead><tbody id="purchases-body"></tbody></table></div>
+      <div class="empty-state purchase-empty" id="purchase-empty-state"><h3>Nenhuma compra neste mês.</h3><p>Cadastre suas compras para calcular o custo médio e o lucro.<br>Compras de meses anteriores também entram no custo médio.</p></div>
+    </section>
+    <aside class="backup-panel" aria-labelledby="backup-title"><div class="backup-copy"><svg><use href="#i-storage"/></svg><div><h2 id="backup-title">Seus dados ficam com você.</h2><p>Vendas e compras ficam apenas neste navegador. Faça backups regularmente<br class="desktop-break"> e antes de limpar os dados ou trocar de computador.</p></div></div><div class="backup-actions"><button class="button secondary" id="export-backup"><svg><use href="#i-download"/></svg>Exportar backup</button><button class="button text-button" id="import-backup"><svg><use href="#i-upload"/></svg>Importar JSON</button><input type="file" id="backup-file" accept=".json,application/json" hidden></div></aside>
+    <footer><span>Menos planilhas. Mais vendas.</span><span>Feito para o seu dia a dia.</span></footer>
+  </main>
+  <dialog id="sale-dialog" aria-labelledby="sale-dialog-title"><form id="sale-form">
+    <div class="dialog-heading"><div><p class="eyebrow">SEU NEGÓCIO EM MOVIMENTO</p><h2 id="sale-dialog-title">Cadastrar venda</h2></div><button type="button" class="icon-button" data-close="sale-dialog" aria-label="Fechar formulário"><svg><use href="#i-close"/></svg></button></div>
+    <label class="field">Cliente / loja<input id="customer" name="customer" type="text" maxlength="120" placeholder="Ex.: Café da Esquina" required autocomplete="off" autofocus></label>
+    <div class="form-grid"><label class="field">Quantidade de plaquinhas<input id="quantity" name="quantity" type="number" min="1" max="1000000" step="1" value="1" required></label><label class="field">Valor total da venda<div class="currency-input"><span>R$</span><input id="amount" name="amount" type="text" inputmode="decimal" placeholder="0,00" maxlength="16" required aria-describedby="amount-help"></div></label></div>
+    <p class="field-help" id="amount-help">Informe o total negociado para todas as plaquinhas.</p>
+    <div class="form-grid"><label class="field">Pagamento<select id="payment" name="payment"><option value="paid">Pago</option><option value="pending">Pendente</option></select></label><label class="field">Data da venda<input id="sale-date" name="date" type="date" min="0001-01-01" max="9999-12-31" required></label></div>
+    <p class="form-error" id="form-error" role="alert" hidden></p>
+    <div class="dialog-footer"><button type="button" class="button secondary" data-close="sale-dialog">Cancelar</button><button type="submit" class="button primary" id="save-sale">Salvar venda</button></div>
+  </form></dialog>
+  <dialog id="purchase-dialog" aria-labelledby="purchase-dialog-title"><form id="purchase-form">
+    <div class="dialog-heading"><div><p class="eyebrow">O CUSTO DO SEU PRODUTO</p><h2 id="purchase-dialog-title">Cadastrar compra</h2></div><button type="button" class="icon-button" data-close="purchase-dialog" aria-label="Fechar formulário de compra"><svg><use href="#i-close"/></svg></button></div>
+    <div class="form-grid"><label class="field">Quantidade comprada<input id="purchase-quantity" name="quantity" type="number" min="1" max="1000000" step="1" value="1" required autofocus></label><label class="field">Custo por unidade<div class="currency-input"><span>R$</span><input id="purchase-unit-cost" name="unitCost" type="text" inputmode="decimal" placeholder="0,00" maxlength="16" required aria-describedby="purchase-help"></div></label></div>
+    <p class="field-help" id="purchase-help">Informe quanto você pagou por cada plaquinha.</p>
+    <label class="field">Data da compra<input id="purchase-date" name="date" type="date" min="0001-01-01" max="9999-12-31" required></label>
+    <div class="purchase-preview"><span>Total desta compra</span><strong id="purchase-total-preview" aria-live="polite">—</strong></div>
+    <p class="form-error" id="purchase-form-error" role="alert" hidden></p>
+    <div class="dialog-footer"><button type="button" class="button secondary" data-close="purchase-dialog">Cancelar</button><button type="submit" class="button primary" id="save-purchase">Salvar compra</button></div>
+  </form></dialog>
+  <dialog id="confirm-dialog" class="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-description"><form method="dialog"><h2 id="confirm-title"></h2><p id="confirm-description"></p><p class="form-error" id="confirm-error" role="alert" hidden></p><div class="dialog-footer"><button class="button secondary" value="cancel" autofocus>Cancelar</button><button class="button primary" id="confirm-action" value="confirm">Confirmar</button></div></form></dialog>
+  <div class="toast" id="toast" role="status" hidden></div>
+  <noscript><p class="error-banner">Ative o JavaScript do navegador para usar o controle de vendas.</p></noscript>
+</body>
+</html>

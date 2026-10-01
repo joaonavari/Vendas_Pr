@@ -1,0 +1,4 @@
+node_modules/
+.DS_Store
+placa-backup-*.json
+placa-recuperacao-*.json
