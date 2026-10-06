@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="./favicon.svg" alt="Ícone do Placa" width="64" height="64">
-  <h1>Placa</h1>
+  <img src="./favicon.svg" alt="Ícone do useget" width="64" height="64">
+  <h1>useget</h1>
   <p><strong>Suas vendas, compras e lucro em um só lugar.</strong></p>
   <p>Um controle simples para quem vende plaquinhas de avaliação do Google com NFC.</p>
   <p>
@@ -13,7 +13,7 @@
 
 ---
 
-O **Placa** foi criado para registrar vendas presenciais com rapidez e acompanhar o resultado do negócio. A interface está em português do Brasil, usa valores em reais e reúne os números do mês em um painel de leitura fácil.
+O **useget** foi criado para registrar vendas presenciais com rapidez e acompanhar o resultado do negócio. A interface está em português do Brasil, usa valores em reais e reúne os números do mês em um painel de leitura fácil.
 
 Feito com **HTML, CSS e JavaScript puros**, funciona inteiramente no navegador, sem login, backend ou etapa de build. Pode ser usado no computador ou publicado no GitHub Pages, inclusive no subdiretório de um repositório.
 

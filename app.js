@@ -40,7 +40,7 @@
   function validateBackup(data) {
     if (!data || data.app !== 'placa' || ![1, 2].includes(data.version) || !Array.isArray(data.sales)
       || (data.version === 2 && !Array.isArray(data.purchases))) {
-      throw new Error('Este arquivo não é um backup válido do Placa (versões 1 ou 2).');
+      throw new Error('Este arquivo não é um backup válido do useget (versões 1 ou 2).');
     }
     if (data.sales.length > 100000) throw new Error('O arquivo excede o limite de 100.000 vendas.');
     const ids = new Set();
@@ -463,7 +463,7 @@
       }
       catch { content = raw; recovery = true; }
       const url = URL.createObjectURL(new Blob([content], { type: 'application/json' }));
-      const link = document.createElement('a'); link.href = url; link.download = `placa-${recovery ? 'recuperacao' : 'backup'}-${localDate()}.json`; document.body.append(link); link.click(); link.remove();
+      const link = document.createElement('a'); link.href = url; link.download = `useget-${recovery ? 'recuperacao' : 'backup'}-${localDate()}.json`; document.body.append(link); link.click(); link.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       toast(recovery ? 'Cópia dos dados originais exportada para recuperação.' : 'Backup exportado com vendas e compras de todos os meses.');
     } catch (error) { toast(`Não foi possível exportar. ${error.message}`); }
@@ -476,7 +476,7 @@
       if (file.size > 20 * 1024 * 1024) throw new Error('Escolha um arquivo JSON de até 20 MB.');
       let data;
       try { data = JSON.parse(await file.text()); }
-      catch { throw new Error('Não foi possível ler o JSON. Escolha um backup exportado pelo Placa.'); }
+      catch { throw new Error('Não foi possível ler o JSON. Escolha um backup exportado pelo useget.'); }
       const imported = validateBackup(data);
       confirmAction('Importar este backup?', `O arquivo contém ${integer(imported.sales.length)} vendas e ${integer(imported.purchases.length)} compras. A importação substituirá todas as vendas e compras deste navegador, de todos os meses${storageHealthy ? ` (${integer(sales.length)} vendas e ${integer(purchases.length)} compras atualmente)` : ''}.${data.version === 1 ? ' Este backup antigo não contém compras; as compras atuais serão removidas.' : ''} Exporte um backup antes de continuar se quiser manter uma cópia.`, 'Substituir e importar', () => {
         persist(imported.sales, true, imported.purchases);
